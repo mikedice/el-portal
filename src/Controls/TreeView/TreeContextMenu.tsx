@@ -1,5 +1,8 @@
 import React from 'react';
 import { ContextMenuSelection } from './ContextualListItem';
+import {
+    makeStyles,
+  } from "@fluentui/react-components";
 
 interface TreeContextMenuProps {
     x: number;
@@ -7,6 +10,14 @@ interface TreeContextMenuProps {
     onSelected: (value: ContextMenuSelection) => void;
 }
 
+const menuStyles = makeStyles({
+    menu:{
+        position: 'absolute',
+        top:''
+    }
+
+
+});
 export const TreeContextMenu: React.FC<TreeContextMenuProps> = ({ x, y, onSelected }) => {
     const handleMenuItemClick = (event: React.MouseEvent<HTMLDivElement>) => {
         event.preventDefault();

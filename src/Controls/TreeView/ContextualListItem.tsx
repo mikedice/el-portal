@@ -1,4 +1,4 @@
-// An li tag with special behaviors for drag and drop
+// An LI tag with custom behaviors like context menu and maybe drag and drop some day :)
 import React from 'react';
 import { useState, useEffect } from 'react';
 import { TreeContextMenu } from './TreeContextMenu'
