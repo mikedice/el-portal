@@ -2,14 +2,14 @@ import {TreeItem} from "./TreeItem"
 import {
     makeStyles,
   } from "@fluentui/react-components";
-import {CaretRight20Regular,CaretDown20Regular} from "@fluentui/react-icons";
+
 import { useState } from "react";
 import { DroppableListItem } from "./DroppableListItem";
 import { ContextualListItem } from "./ContextualListItem";
 
 const useStyles = makeStyles({
     treeView: {
-        //'list-style-type': 'none',
+        'list-style-type': 'none',
         //'min-width': '200px'
     }
 });
@@ -92,10 +92,11 @@ export default function TreeView()
         return jsx;
     }
 
-    
+    const styles = useStyles()
     return (
+    
         <>
-        <ul>
+        <ul className={styles.treeView}>
             {createTree(data)}      
         </ul>
         {/*
