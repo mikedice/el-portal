@@ -2,14 +2,13 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
 import { TreeContextMenu } from './TreeContextMenu'
-import {CaretRight20Regular,CaretDown20Regular} from "@fluentui/react-icons";
+import { CaretRight20Regular, CaretDown20Regular } from "@fluentui/react-icons";
 
 // State used within this component to control show/hide of the context menu
 export interface ContextMenuState {
     x: number,
     y: number,
-    show: boolean,
-    collapsed: boolean
+    show: boolean
 }
 
 // Used by TreeContextMenu to communicate state back to this component
@@ -21,14 +20,15 @@ export interface ContextMenuSelection {
     selectedValue: string
 }
 
-export function ContextualListItem({ children }: { children: React.ReactNode }) {
+export function ContextualListItem({ children, name }: { children: React.ReactNode, name: string }) {
     const [contextMenuState, setShowContextMenu] = useState<ContextMenuState>({ x: 0, y: 0, show: false });
     const [contextMenuSelection, setShowContextMenuSelection] = useState<ContextMenuSelection>({ x: 0, y: 0, selectedId: "", selectedValue: "" });
+    const [collapsedState, setCollapsedState] = useState<boolean>(false);
 
     // Dismiss the context menu if the user clicks outside of it
     useEffect(() => {
         const handleClickOutside = () => {
-            setShowContextMenu({ x: 0, y: 0, show: false, collapsed: false });
+            setShowContextMenu({ x: 0, y: 0, show: false });
         }
         document.addEventListener('click', handleClickOutside);
         return () => {
@@ -44,8 +44,7 @@ export function ContextualListItem({ children }: { children: React.ReactNode }) 
         setShowContextMenu({
             x: 0,
             y: 0,
-            show: false,
-            collapsed: false
+            show: false
         });
 
         // if context menu was selected update the state to do something with it.
@@ -58,16 +57,36 @@ export function ContextualListItem({ children }: { children: React.ReactNode }) 
     const handleContextMenu = (event: React.MouseEvent) => {
         event.preventDefault();
         event.stopPropagation();
-        setShowContextMenu({ x: event.clientX, y: event.clientY, show: true, collapsed: false });
+        setShowContextMenu({ x: event.clientX, y: event.clientY, show: true });
     };
 
-    return (<li className={'contextualLi'} onContextMenu={handleContextMenu} >
-        {contextMenuState.collapsed ? <span>CaretRight20Regular</span> : <span> CaretDown20Regular</span>} 
-        {children}
-        {contextMenuState.show &&< TreeContextMenu
-            x={contextMenuState.x}
-            y={contextMenuState.y}
-            onSelected={setShowContextMenuSelection} />}
-    </li>)
+    // Toggle the expander icon
+    const handleExpanderClick = (event: React.MouseEvent) => {
+        event.preventDefault();
+        setCollapsedState(!collapsedState);
+    }
+
+    return (
+
+        <li className={'contextualLi'} onContextMenu={handleContextMenu} >
+            {/* A caret that gets toggled base on the collapsedState state variable */}
+            {
+                React.Children.toArray(children).length > 0 && (
+                    collapsedState ?
+                        <CaretRight20Regular onClick={handleExpanderClick} />
+                        : <CaretDown20Regular onClick={handleExpanderClick} />)
+            }
+            {/* A span that contains the name of hte LI */}
+            {<span>{name}</span>}
+
+            {/* All the children that may or may not have been passed in */}
+            {!collapsedState ? (children) : null}
+
+            {/* The context menu that may or may not be shown */}
+            {contextMenuState.show && < TreeContextMenu
+                x={contextMenuState.x}
+                y={contextMenuState.y}
+                onSelected={setShowContextMenuSelection} />}
+        </li>)
 
 }

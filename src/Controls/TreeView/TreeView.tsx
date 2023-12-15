@@ -77,7 +77,7 @@ export default function TreeView()
             
             if (node.children !== undefined || (node.children ?? []).length > 0) {
                 return (
-                    <ContextualListItem>{node.nodeName}
+                    <ContextualListItem name={node.nodeName}>
                         <ul className={styles.treeView}>
                             {createTree(node.children ?? [])}
                         </ul>
@@ -85,7 +85,7 @@ export default function TreeView()
                 );
             }
             else{
-                return <ContextualListItem>{node.nodeName}</ContextualListItem>
+                return <ContextualListItem name={node.nodeName}>{}</ContextualListItem>
             }
 
         });
