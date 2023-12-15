@@ -86,7 +86,8 @@ export function ContextualListItem({ children, name }: { children: React.ReactNo
             {contextMenuState.show && < TreeContextMenu
                 x={contextMenuState.x}
                 y={contextMenuState.y}
-                onSelected={setShowContextMenuSelection} />}
+                onSelected={setShowContextMenuSelection}
+                 />}
         </li>)
 
 }
