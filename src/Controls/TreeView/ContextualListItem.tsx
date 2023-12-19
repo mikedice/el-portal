@@ -1,8 +1,10 @@
 // An LI tag with custom behaviors like context menu and maybe drag and drop some day :)
 import React from 'react';
 import { useState, useEffect } from 'react';
-import { TreeContextMenu } from './TreeContextMenu'
-import { CaretRight20Regular, CaretDown20Regular } from "@fluentui/react-icons";
+import { TreeContextMenu, TreeContextMenuItem } from './TreeContextMenu'
+import { CaretRight24Regular, CaretDown24Regular } from "@fluentui/react-icons";
+import { makeStyles, shorthands } from "@fluentui/react-components";
+import {tokens} from '@fluentui/react-theme';
 
 // State used within this component to control show/hide of the context menu
 export interface ContextMenuState {
@@ -20,10 +22,27 @@ export interface ContextMenuSelection {
     selectedValue: string
 }
 
-export function ContextualListItem({ children, name }: { children: React.ReactNode, name: string }) {
+const useStyles = makeStyles({
+    nodeExpanderLabel:{
+        display: 'flex',
+        ...shorthands.padding('4px')
+    },
+    nodeExpanderIcon:{
+        ':hover':{
+            cursor: 'pointer',
+            backgroundColor: tokens.colorNeutralBackground1Hover,
+        }
+    },
+    contextualListItem: {
+        fontSize: tokens.fontSizeBase500
+    }
+});
+
+export function ContextualListItem({ children, name, contextMenuItems }: { children: React.ReactNode, name: string, contextMenuItems?: TreeContextMenuItem[] }) {
     const [contextMenuState, setShowContextMenu] = useState<ContextMenuState>({ x: 0, y: 0, show: false });
     const [contextMenuSelection, setShowContextMenuSelection] = useState<ContextMenuSelection>({ x: 0, y: 0, selectedId: "", selectedValue: "" });
     const [collapsedState, setCollapsedState] = useState<boolean>(false);
+    const styles = useStyles();
 
     // Dismiss the context menu if the user clicks outside of it
     useEffect(() => {
@@ -53,7 +72,7 @@ export function ContextualListItem({ children, name }: { children: React.ReactNo
         }
     }, [contextMenuSelection]);
 
-    // Show the context menu and prevent the default context menu from showing
+    // Show the context menu and prevent the browser's default context menu from showing
     const handleContextMenu = (event: React.MouseEvent) => {
         event.preventDefault();
         event.stopPropagation();
@@ -68,26 +87,28 @@ export function ContextualListItem({ children, name }: { children: React.ReactNo
 
     return (
 
-        <li className={'contextualLi'} onContextMenu={handleContextMenu} >
-            {/* A caret that gets toggled base on the collapsedState state variable */}
-            {
-                React.Children.toArray(children).length > 0 && (
-                    collapsedState ?
-                        <CaretRight20Regular onClick={handleExpanderClick} />
-                        : <CaretDown20Regular onClick={handleExpanderClick} />)
-            }
-            {/* A span that contains the name of hte LI */}
-            {<span>{name}</span>}
-
+        <li className={styles.contextualListItem} onContextMenu={handleContextMenu} >
+            <div className={styles.nodeExpanderLabel}>
+                {/* A caret that gets toggled base on the collapsedState state variable */}
+                {
+                    React.Children.toArray(children).length > 0 && (
+                        collapsedState ?
+                            <CaretRight24Regular className={styles.nodeExpanderIcon} onClick={handleExpanderClick} />
+                            : <CaretDown24Regular className={styles.nodeExpanderIcon} onClick={handleExpanderClick} />)
+                }
+                {/* A span that contains the name of hte LI */}
+                {<span>{name}</span>}
+            </div>
             {/* All the children that may or may not have been passed in */}
             {!collapsedState ? (children) : null}
 
             {/* The context menu that may or may not be shown */}
-            {contextMenuState.show && < TreeContextMenu
+            {(contextMenuState.show && contextMenuItems && contextMenuItems.length > 0) && < TreeContextMenu
                 x={contextMenuState.x}
                 y={contextMenuState.y}
                 onSelected={setShowContextMenuSelection}
-                 />}
+                items={contextMenuItems}
+            />}
         </li>)
 
 }

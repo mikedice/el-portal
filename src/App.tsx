@@ -1,8 +1,7 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+
 import './App.css'
 import TreeView from './Controls/TreeView/TreeView'
+import {TestData} from './Controls/TreeView/TestData'
 
 function App() {
   return (
@@ -10,7 +9,7 @@ function App() {
       <h1>El Portal Controls</h1>
       <h2>Tree control</h2>
       <div>
-        <TreeView></TreeView>
+        <TreeView data={TestData}></TreeView>
       </div>
     </>
   )

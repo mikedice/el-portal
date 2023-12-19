@@ -1,14 +1,23 @@
 import React from 'react';
 import { ContextMenuSelection } from './ContextualListItem';
+import {tokens} from '@fluentui/react-theme';
 import {
     makeStyles,
     shorthands
   } from "@fluentui/react-components";
 
+
+export interface TreeContextMenuItem{
+    id: string,
+    label: string,
+    value: string
+}
+
 interface TreeContextMenuProps {
     x: number;
     y: number;
     onSelected: (value: ContextMenuSelection) => void;
+    items?: TreeContextMenuItem[]
 }
 
 const menuStyles = makeStyles({
@@ -16,11 +25,12 @@ const menuStyles = makeStyles({
         position: 'absolute',
         backgroundColor: 'white',
         boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.2)',
-        ...shorthands.padding('8px')
+        ...shorthands.padding('8px'),
+        fontSize: tokens.fontSizeBase500
     }
 });
 
-export const TreeContextMenu: React.FC<TreeContextMenuProps> = ({ x, y, onSelected }) => {
+export const TreeContextMenu: React.FC<TreeContextMenuProps> = ({ x, y, onSelected, items }) => {
     const handleMenuItemClick = (event: React.MouseEvent<HTMLDivElement>) => {
         event.preventDefault();
         onSelected({x:event.clientX, y:event.clientY, selectedId: event.currentTarget.id, selectedValue:event.currentTarget.textContent!})
@@ -37,9 +47,16 @@ export const TreeContextMenu: React.FC<TreeContextMenuProps> = ({ x, y, onSelect
             onContextMenu={handleMenuItemClick}
         >
             {/* Add your context menu items here */}
-            <div onClick={handleMenuItemClick} id={'Item1'}>Item 1</div>
-            <div onClick={handleMenuItemClick} id={'Item2'}>Item 2</div>
-            <div onClick={handleMenuItemClick} id={'Item3'}>Item 3</div>
+            {items && items.map((item) => {
+                return (
+                    <div
+                        id={item.id}
+                        key={item.id}
+                    >
+                        {item.label}
+                    </div>
+                )
+            })}
         </div>
     );
 };
