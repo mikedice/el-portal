@@ -10,16 +10,16 @@ import {tokens} from '@fluentui/react-theme';
 export interface ContextMenuState {
     x: number,
     y: number,
-    show: boolean
+    nodeId: string
 }
 
 // Used by TreeContextMenu to communicate state back to this component
 // if the user selects an item from the context menu.
 export interface ContextMenuSelection {
-    x: number,
-    y: number,
-    selectedId: string,
-    selectedValue: string
+    menuId: string,
+    menuValue: string
+    menuLabel: string
+    nodeId: string
 }
 
 const useStyles = makeStyles({
@@ -38,16 +38,27 @@ const useStyles = makeStyles({
     }
 });
 
-export function ContextualListItem({ children, name, contextMenuItems }: { children: React.ReactNode, name: string, contextMenuItems?: TreeContextMenuItem[] }) {
-    const [contextMenuState, setShowContextMenu] = useState<ContextMenuState>({ x: 0, y: 0, show: false });
-    const [contextMenuSelection, setShowContextMenuSelection] = useState<ContextMenuSelection>({ x: 0, y: 0, selectedId: "", selectedValue: "" });
+export function ContextualListItem({ children, name, nodeId, contextMenuItems, contextMenuState, setContextMenuState, setContextMenuSelection}: 
+    { children: React.ReactNode, 
+        name: string, 
+        nodeId: string, 
+        contextMenuItems?: TreeContextMenuItem[],
+        contextMenuState: ContextMenuState
+        setContextMenuState: (state: ContextMenuState)=>void,
+        setContextMenuSelection: (selection:ContextMenuSelection)=>void
+    }) {
+
     const [collapsedState, setCollapsedState] = useState<boolean>(false);
     const styles = useStyles();
+
+    function dismissContextMenus(){
+        setContextMenuState({...contextMenuState, nodeId:""});
+    }
 
     // Dismiss the context menu if the user clicks outside of it
     useEffect(() => {
         const handleClickOutside = () => {
-            setShowContextMenu({ x: 0, y: 0, show: false });
+            dismissContextMenus();
         }
         document.addEventListener('click', handleClickOutside);
         return () => {
@@ -55,28 +66,19 @@ export function ContextualListItem({ children, name, contextMenuItems }: { child
         }
     }, []);
 
-    // respond to changes in the menu item selection state. Basically just hide the context menu
-    useEffect(() => {
-        // this can be called multiple times with the initial value
-        // so only change state if an actual value was selected. But,
-        // always dismiss context menu.
-        setShowContextMenu({
-            x: 0,
-            y: 0,
-            show: false
-        });
 
-        // if context menu was selected update the state to do something with it.
-        if (contextMenuSelection.selectedId) {
-            // do something with the selected item
-        }
-    }, [contextMenuSelection]);
 
     // Show the context menu and prevent the browser's default context menu from showing
     const handleContextMenu = (event: React.MouseEvent) => {
         event.preventDefault();
         event.stopPropagation();
-        setShowContextMenu({ x: event.clientX, y: event.clientY, show: true });
+
+        // The parent TreeView is notified of a new context menu about to be shown. This gives
+        // the parent Treeview a chance to dismiss any currently open context menus in the tree
+        if (contextMenuItems && contextMenuItems.length > 0){
+            dismissContextMenus()
+        }
+        setContextMenuState({ x: event.clientX, y: event.clientY, nodeId: nodeId });
     };
 
     // Toggle the expander icon
@@ -99,14 +101,16 @@ export function ContextualListItem({ children, name, contextMenuItems }: { child
                 {/* A span that contains the name of hte LI */}
                 {<span>{name}</span>}
             </div>
+            
             {/* All the children that may or may not have been passed in */}
             {!collapsedState ? (children) : null}
 
             {/* The context menu that may or may not be shown */}
-            {(contextMenuState.show && contextMenuItems && contextMenuItems.length > 0) && < TreeContextMenu
+            {(contextMenuState.nodeId == nodeId && contextMenuItems && contextMenuItems.length > 0) && < TreeContextMenu
                 x={contextMenuState.x}
                 y={contextMenuState.y}
-                onSelected={setShowContextMenuSelection}
+                nodeId={nodeId}
+                setContextMenuSelection={setContextMenuSelection}
                 items={contextMenuItems}
             />}
         </li>)

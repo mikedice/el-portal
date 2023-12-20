@@ -16,8 +16,9 @@ export interface TreeContextMenuItem{
 interface TreeContextMenuProps {
     x: number;
     y: number;
-    onSelected: (value: ContextMenuSelection) => void;
-    items?: TreeContextMenuItem[]
+    nodeId:string;
+    setContextMenuSelection: (selection:ContextMenuSelection)=>void;
+    items?: TreeContextMenuItem[];
 }
 
 const menuStyles = makeStyles({
@@ -26,15 +27,25 @@ const menuStyles = makeStyles({
         backgroundColor: 'white',
         boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.2)',
         ...shorthands.padding('8px'),
-        fontSize: tokens.fontSizeBase500
+        fontSize: tokens.fontSizeBase500,
+        cursor: 'default'
     }
 });
 
-export const TreeContextMenu: React.FC<TreeContextMenuProps> = ({ x, y, onSelected, items }) => {
+export const TreeContextMenu: React.FC<TreeContextMenuProps> = ({ x, y, nodeId, setContextMenuSelection, items }) => {
+    
     const handleMenuItemClick = (event: React.MouseEvent<HTMLDivElement>) => {
         event.preventDefault();
-        onSelected({x:event.clientX, y:event.clientY, selectedId: event.currentTarget.id, selectedValue:event.currentTarget.textContent!})
+
+        const newValue = {
+            nodeId: nodeId, 
+            menuId: event.currentTarget.id, 
+            menuLabel:event.currentTarget.textContent!, 
+            menuValue: event.currentTarget.dataset.value ?? ''
+        }
+        setContextMenuSelection(newValue)
     };
+    
     const styles = menuStyles()
 
     return (
@@ -44,7 +55,7 @@ export const TreeContextMenu: React.FC<TreeContextMenuProps> = ({ x, y, onSelect
                 left: x
             }}
             className={styles.menu}
-            onContextMenu={handleMenuItemClick}
+            onClick={handleMenuItemClick}
         >
             {/* Add your context menu items here */}
             {items && items.map((item) => {
@@ -52,6 +63,7 @@ export const TreeContextMenu: React.FC<TreeContextMenuProps> = ({ x, y, onSelect
                     <div
                         id={item.id}
                         key={item.id}
+                        data-value={item.value}
                     >
                         {item.label}
                     </div>

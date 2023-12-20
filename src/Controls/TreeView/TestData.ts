@@ -2,7 +2,7 @@ import {TreeNode} from "./TreeNode"
 
 export const TestData: TreeNode[] = [
     {
-        id: 1,
+        id: "1",
         nodeName: "node1",
         contextMenuItems: [
             {
@@ -13,51 +13,51 @@ export const TestData: TreeNode[] = [
         ],
         children: [
             {
-                id: 3,
+                id: "2",
                 nodeName: "node3",
                 contextMenuItems: [
                     {
-                        id: "item1",
+                        id: "item3",
                         value: "item 3",
                         label: "item 3"
                     }
                 ],
                 children: [
                     {
-                        id: 1,
+                        id: "3",
                         nodeName: "item3.1",
                         contextMenuItems: []
                     },
                     {
-                        id: 2,
+                        id: "4",
                         nodeName: "item3.2"
                     }
                 ],
             },
             {
-                id: 4,
+                id: "5",
                 nodeName: "node4",
                 contextMenuItems: [
                     {
-                        id: "item1",
+                        id: "item4",
                         value: "item 4",
                         label: "item 4"
                     }
                 ],
                 children: [
                     {
-                        id: 1,
+                        id: "6",
                         nodeName: "item4.1",
                         contextMenuItems: [
                             {
-                                id: "item1",
+                                id: "item4.1",
                                 value: "item 4.1",
                                 label: "item 4.1"
                             }
                         ],
                     },
                     {
-                        id: 2,
+                        id: "7",
                         nodeName: "item4.2"
                     }
                 ],
