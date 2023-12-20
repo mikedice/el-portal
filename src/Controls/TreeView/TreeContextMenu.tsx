@@ -1,13 +1,10 @@
 import React from 'react';
 import { ContextMenuSelection } from './ContextualListItem';
-import {tokens} from '@fluentui/react-theme';
-import {
-    makeStyles,
-    shorthands
-  } from "@fluentui/react-components";
+import { tokens } from '@fluentui/react-theme';
+import { makeStyles, shorthands } from "@fluentui/react-components";
 
 
-export interface TreeContextMenuItem{
+export interface TreeContextMenuItem {
     id: string,
     label: string,
     value: string
@@ -16,13 +13,13 @@ export interface TreeContextMenuItem{
 interface TreeContextMenuProps {
     x: number;
     y: number;
-    nodeId:string;
-    setContextMenuSelection: (selection:ContextMenuSelection)=>void;
+    nodeId: string;
+    setContextMenuSelection: (selection: ContextMenuSelection) => void;
     items?: TreeContextMenuItem[];
 }
 
 const menuStyles = makeStyles({
-    menu:{
+    menu: {
         position: 'absolute',
         backgroundColor: 'white',
         boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.2)',
@@ -33,19 +30,19 @@ const menuStyles = makeStyles({
 });
 
 export const TreeContextMenu: React.FC<TreeContextMenuProps> = ({ x, y, nodeId, setContextMenuSelection, items }) => {
-    
+
     const handleMenuItemClick = (event: React.MouseEvent<HTMLDivElement>) => {
         event.preventDefault();
 
         const newValue = {
-            nodeId: nodeId, 
-            menuId: event.currentTarget.id, 
-            menuLabel:event.currentTarget.textContent!, 
+            nodeId: nodeId,
+            menuId: event.currentTarget.id,
+            menuLabel: event.currentTarget.textContent!,
             menuValue: event.currentTarget.dataset.value ?? ''
         }
         setContextMenuSelection(newValue)
     };
-    
+
     const styles = menuStyles()
 
     return (

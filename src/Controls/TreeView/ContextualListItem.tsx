@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { TreeContextMenu, TreeContextMenuItem } from './TreeContextMenu'
 import { CaretRight24Regular, CaretDown24Regular } from "@fluentui/react-icons";
 import { makeStyles, shorthands } from "@fluentui/react-components";
-import {tokens} from '@fluentui/react-theme';
+import { tokens } from '@fluentui/react-theme';
 
 // State used within this component to control show/hide of the context menu
 export interface ContextMenuState {
@@ -23,12 +23,12 @@ export interface ContextMenuSelection {
 }
 
 const useStyles = makeStyles({
-    nodeExpanderLabel:{
+    nodeExpanderLabel: {
         display: 'flex',
         ...shorthands.padding('4px')
     },
-    nodeExpanderIcon:{
-        ':hover':{
+    nodeExpanderIcon: {
+        ':hover': {
             cursor: 'pointer',
             backgroundColor: tokens.colorNeutralBackground1Hover,
         }
@@ -38,21 +38,22 @@ const useStyles = makeStyles({
     }
 });
 
-export function ContextualListItem({ children, name, nodeId, contextMenuItems, contextMenuState, setContextMenuState, setContextMenuSelection}: 
-    { children: React.ReactNode, 
-        name: string, 
-        nodeId: string, 
+export function ContextualListItem({ children, name, nodeId, contextMenuItems, contextMenuState, setContextMenuState, setContextMenuSelection }:
+    {
+        children: React.ReactNode,
+        name: string,
+        nodeId: string,
         contextMenuItems?: TreeContextMenuItem[],
         contextMenuState: ContextMenuState
-        setContextMenuState: (state: ContextMenuState)=>void,
-        setContextMenuSelection: (selection:ContextMenuSelection)=>void
+        setContextMenuState: (state: ContextMenuState) => void,
+        setContextMenuSelection: (selection: ContextMenuSelection) => void
     }) {
 
     const [collapsedState, setCollapsedState] = useState<boolean>(false);
     const styles = useStyles();
 
-    function dismissContextMenus(){
-        setContextMenuState({...contextMenuState, nodeId:""});
+    function dismissContextMenus() {
+        setContextMenuState({ ...contextMenuState, nodeId: "" });
     }
 
     // Dismiss the context menu if the user clicks outside of it
@@ -75,7 +76,7 @@ export function ContextualListItem({ children, name, nodeId, contextMenuItems, c
 
         // The parent TreeView is notified of a new context menu about to be shown. This gives
         // the parent Treeview a chance to dismiss any currently open context menus in the tree
-        if (contextMenuItems && contextMenuItems.length > 0){
+        if (contextMenuItems && contextMenuItems.length > 0) {
             dismissContextMenus()
         }
         setContextMenuState({ x: event.clientX, y: event.clientY, nodeId: nodeId });
@@ -101,7 +102,7 @@ export function ContextualListItem({ children, name, nodeId, contextMenuItems, c
                 {/* A span that contains the name of hte LI */}
                 {<span>{name}</span>}
             </div>
-            
+
             {/* All the children that may or may not have been passed in */}
             {!collapsedState ? (children) : null}
 

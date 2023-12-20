@@ -1,19 +1,18 @@
 // An li tag with special behaviors for drag and drop
 
-
-
 import React from 'react';
 import { useState } from 'react';
 
+/* Not used at this time */
 export function DroppableListItem({ children }: { children: React.ReactNode }) {
     const [isDragOver, setIsDragOver] = useState(false);
 
-    function addDropIndicator(event: React.DragEvent<HTMLLIElement>){
+    function addDropIndicator(event: React.DragEvent<HTMLLIElement>) {
         if (
             document.elementFromPoint(event.clientX, event.clientY) === event.currentTarget) {
             setIsDragOver(true)
         }
-        else{
+        else {
             setIsDragOver(false);
         }
     }
