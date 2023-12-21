@@ -36,6 +36,39 @@ I used this command to bootstrap this project: ```npm create vite@latest el-port
 1. Go to the root of the target project where you wish to consume the el-portal package. Run the command ```npm link el-portal```
 1. In your TS code you should now be able to import TreeView and TreeNode
 
+## Code needed in the application
+The application is responsible for maintaining the data tree that is rendered by the TreeView. In that respect
+the application would call the react useState function to set up a state variable and setter for the data tree.
+The data tree itself is a tree of TreeNode objects. Each node can have a collection of TreeContextMenuItem objects.
+If the node does have a TreeContextMenuItem collection then when a context menu is invoked on a node, for example 
+by right clicking on the node, the items in the TreeContextMenuItem collection are displayed as a context menu.
+The app will want to respond to the user clicking on a context menu item in some way. The selected context menu item
+is stored as a state variable created using the react useState API. The state variable's setter is passed down
+to the TreeView which will respond to context menu selections and call the setter with the new selection if a 
+selection is made. Apps, will likely perform some kind of app specific action in response to a context menu 
+item being selected. The app can use the react useEffect API to monitor the context menu state variable and perform
+some app specific action in response. Here is a sample
+```
+export default function DDUEDocument() {
+// The tree data in this case represents a document as a tree
+const [treeData /*, setTreeData*/] = useState<TreeNode[]>(TestData); // Keep track of tree data as state
+
+// The app keeps a state property that is modified when a context menu is selected. The app would
+// usually monitor changes to this variable and perform an app specific action in response.
+const [contextMenuSelection, setContextMenuSelection] = useState<ContextMenuSelection>({ menuId: "", menuValue: "", menuLabel: "", nodeId: "" });
+
+// The useEffect API is used to respond to context menu selections from within the tree
+useEffect(() => {
+if (contextMenuSelection.nodeId) {
+    // TODO: do some app specific thing at this point. A context menu item was selected.
+    console.log(`App Tree menu item selected: ${JSON.stringify(contextMenuSelection)}`)
+}
+}, [contextMenuSelection]);
+
+// rest of app code follows....
+}
+```
+
 
 ## Contact ##
 Have questions? Here is my contact information:

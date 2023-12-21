@@ -11,18 +11,21 @@ const useStyles = makeStyles({
     }
 });
 
-export default function TreeView({ data }: { data: TreeNode[] }) {
-    const [treeData /*, setTreeData*/] = useState<TreeNode[]>(data); // Keep track of tree data as state
-
+export default function TreeView({ appData, setAppContextMenuSelection }: 
+    {
+        appData: TreeNode[], 
+        setAppContextMenuSelection: (selection:ContextMenuSelection)=>void
+    })
+    {
     // The contextMenuState is lifted to the TreeView so the TreeView can control the showing of 
     // context menus on nodes within the tree. This results in prevention of more than one context
     // menu showing at a time and the dismissing of all context menus if the user clicks off a menu.
     // Requirement: all nodes in the TreeNode structure must have an ID that is unique amongst all nodes in the structure.
     const [contextMenuState, setContextMenuState] = useState<ContextMenuState>({ x: 0, y: 0, nodeId: "" });
 
-    // The contextMenuSelection is lifted to the TreeView as the treeview is the top of the hierarchy and controls
-    // the tree data. The assumption is that the context menu actions are meant to perform operations
-    // on the tree's data so the Treeview is the best place to handle context menu selection
+    // The contextMenuSelection is lifted to the TreeView as the treeview is the top of the view hierarchy.
+    // The treeview needs to respond to selection by dismissing all open context menus within the tree and
+    // then it needs to let the app know that a context menu item was selected.
     const [contextMenuSelection, setContextMenuSelection] = useState<ContextMenuSelection>({ menuId: "", menuValue: "", menuLabel: "", nodeId: "" });
 
     // When a context menu item is selected the context menu will set the contextMenuSelection state
@@ -34,7 +37,7 @@ export default function TreeView({ data }: { data: TreeNode[] }) {
 
         // if context menu was selected update the state to do something with it.
         if (contextMenuSelection.nodeId) {
-            console.log(`Tree menu item selected: ${JSON.stringify(contextMenuSelection)}`)
+            setAppContextMenuSelection(contextMenuSelection)
         }
     }, [contextMenuSelection]);
 
@@ -76,7 +79,7 @@ export default function TreeView({ data }: { data: TreeNode[] }) {
     const styles = useStyles()
     return (
         <ul className={styles.treeView}>
-            {createTree(treeData)}
+            {createTree(appData)}
         </ul>
     )
 }
