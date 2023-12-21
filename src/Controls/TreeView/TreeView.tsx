@@ -12,7 +12,7 @@ const useStyles = makeStyles({
 });
 
 export default function TreeView({ data }: { data: TreeNode[] }) {
-    const [treeData, setTreeData] = useState<TreeNode[]>(data); // Keep track of tree data as state
+    const [treeData /*, setTreeData*/] = useState<TreeNode[]>(data); // Keep track of tree data as state
 
     // The contextMenuState is lifted to the TreeView so the TreeView can control the showing of 
     // context menus on nodes within the tree. This results in prevention of more than one context

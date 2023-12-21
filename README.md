@@ -26,6 +26,17 @@ I used this command to bootstrap this project: ```npm create vite@latest el-port
 1. ```npm install```
 1. ```npm run dev```
 
+## Build and use el-portal as a library
+1. Install NodeJS and NPM. I am currently using node v18.18.2 and npm 9.8.1
+1. Clone the repo
+1. Change directory into the directory that contains the repo you just cloned
+1. Run the command `npm run build`. This command will produce a ```.\dist directory```
+1. Currently you have to 'statically link' this library as it is not published to NPM yet
+1. Still in the root directory run the command ```npm link```. This will create a file system link to this directory in the global npm packages directory
+1. Go to the root of the target project where you wish to consume the el-portal package. Run the command ```npm link el-portal```
+1. In your TS code you should now be able to import TreeView and TreeNode
+
+
 ## Contact ##
 Have questions? Here is my contact information:
 * Personal email [mikedice417@hotmail.com](mailto:mikedice417@hotmail.com) 

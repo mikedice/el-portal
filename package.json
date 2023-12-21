@@ -14,6 +14,8 @@
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
+    "@fluentui/react-components": "^9.31.0",
+    "@types/node": "^20.10.5",
     "@types/react": "^18.2.37",
     "@types/react-dom": "^18.2.15",
     "@typescript-eslint/eslint-plugin": "^6.10.0",
@@ -24,6 +26,9 @@
     "eslint-plugin-react-refresh": "^0.4.4",
     "typescript": "^5.2.2",
     "vite": "^5.0.0",
-    "@fluentui/react-components": "^9.31.0"
-  }
+    "vite-plugin-dts": "^3.6.4"
+  },
+  "main": "./dist/el-portal.umd.cjs",
+  "module": "./dist/el-portal.js",
+  "types": "./dist/Controls/TreeView/index.d.ts"
 }
