@@ -52,7 +52,6 @@ export const TreeContextMenu: React.FC<TreeContextMenuProps> = ({ x, y, nodeId, 
                 left: x
             }}
             className={styles.menu}
-            onClick={handleMenuItemClick}
         >
             {/* Add your context menu items here */}
             {items && items.map((item) => {
@@ -61,6 +60,7 @@ export const TreeContextMenu: React.FC<TreeContextMenuProps> = ({ x, y, nodeId, 
                         id={item.id}
                         key={item.id}
                         data-value={item.value}
+                        onClick={handleMenuItemClick}
                     >
                         {item.label}
                     </div>

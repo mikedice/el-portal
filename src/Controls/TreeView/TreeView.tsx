@@ -41,9 +41,11 @@ export default function TreeView({ appData, setAppContextMenuSelection }:
         }
     }, [contextMenuSelection]);
 
+    const styles = useStyles();
+
     // Recursively walk the tree and create JSX. Fun!
     function createTree(data: TreeNode[]) {
-        const styles = useStyles();
+
         var jsx = data.map((node: TreeNode) => {
 
             if (node.children !== undefined || (node.children ?? []).length > 0) {
@@ -75,8 +77,6 @@ export default function TreeView({ appData, setAppContextMenuSelection }:
         });
         return jsx;
     }
-
-    const styles = useStyles()
     return (
         <ul className={styles.treeView}>
             {createTree(appData)}
