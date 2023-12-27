@@ -1,6 +1,6 @@
 import { TreeNode } from "./TreeNode"
 
-export const TestData: TreeNode[] = [
+export const TestData: TreeNode<number>[] = [
     {
         id: "1",
         nodeName: "node1",

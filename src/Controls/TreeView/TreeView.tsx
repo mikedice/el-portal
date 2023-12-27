@@ -11,9 +11,9 @@ const useStyles = makeStyles({
     }
 });
 
-export default function TreeView({ appData, setAppContextMenuSelection }: 
+export default function TreeView<T>({ appData, setAppContextMenuSelection }: 
     {
-        appData: TreeNode[], 
+        appData: TreeNode<T>[], 
         setAppContextMenuSelection: (selection:ContextMenuSelection)=>void
     })
     {
@@ -44,9 +44,9 @@ export default function TreeView({ appData, setAppContextMenuSelection }:
     const styles = useStyles();
 
     // Recursively walk the tree and create JSX. Fun!
-    function createTree(data: TreeNode[]) {
+    function createTree(data: TreeNode<T>[]) {
 
-        var jsx = data.map((node: TreeNode) => {
+        var jsx = data.map((node: TreeNode<T>) => {
 
             if (node.children !== undefined || (node.children ?? []).length > 0) {
                 return (
@@ -55,7 +55,7 @@ export default function TreeView({ appData, setAppContextMenuSelection }:
                         contextMenuState={contextMenuState}
                         setContextMenuState={setContextMenuState}
                         setContextMenuSelection={setContextMenuSelection}
-                        nodeId={node.id}
+                        nodeId={node.id ?? ""}
                         key={node.id}>
                         <ul className={styles.treeView}>
                             {createTree(node.children ?? [])}
@@ -67,7 +67,7 @@ export default function TreeView({ appData, setAppContextMenuSelection }:
                 return <ContextualListItem
                     name={node.nodeName}
                     contextMenuItems={node.contextMenuItems}
-                    nodeId={node.id}
+                    nodeId={node.id ?? ""}
                     contextMenuState={contextMenuState}
                     setContextMenuState={setContextMenuState}
                     setContextMenuSelection={setContextMenuSelection}
