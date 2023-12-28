@@ -91,6 +91,7 @@ export default function TreeView<T>({ appData, setAppContextMenuSelection, setAp
         });
         return jsx;
     }
+  
     return (
         <ul className={styles.treeView}>
             {createTree(appData)}

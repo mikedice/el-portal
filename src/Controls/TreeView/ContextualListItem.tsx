@@ -75,7 +75,6 @@ export function ContextualListItem({ children, name, nodeId, contextMenuItems, c
 
     function dismissContextMenus() {
         setContextMenuState({ ...contextMenuState, nodeId: "" });
-        setSelectedItem("");
     }
 
     // Dismiss the context menu if the user clicks outside of it
@@ -88,7 +87,7 @@ export function ContextualListItem({ children, name, nodeId, contextMenuItems, c
             document.removeEventListener('click', handleClickOutside);
         }
     }, []);
-
+    
 
 
     // Show the context menu and prevent the browser's default context menu from showing

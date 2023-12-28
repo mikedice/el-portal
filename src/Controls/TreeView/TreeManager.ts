@@ -46,6 +46,21 @@ export class TreeManager<T>{
         return this.copyTree(tree);
     }
 
+    public updateNode(node: TreeNode<T>, tree: TreeNode<T>[]): TreeNode<T>[] {
+        const newTree: TreeNode<T>[] = []
+        for (const treeNode of tree) {
+            if (treeNode.id === node.id) {
+                newTree.push(node)
+            } else {
+                if (treeNode.children && treeNode.children.length > 0) {
+                    treeNode.children = this.updateNode(node, treeNode.children)
+                }
+                newTree.push(treeNode)
+            }
+        }
+        return newTree
+    }
+
     public deleteNode(nodeId: string, tree: TreeNode<T>[]): TreeNode<T>[] {
         const newTree: TreeNode<T>[] = []
         for (const node of tree) {
@@ -75,17 +90,19 @@ export class TreeManager<T>{
         return result;
     }
 
-    private copyTree(tree: TreeNode<T>[]): TreeNode<T>[] {
+    public copyTree(tree: TreeNode<T>[]): TreeNode<T>[] {
         const newTree: TreeNode<T>[] = []
         for (const node of tree) {
             const newNode: TreeNode<T> = {
                 id: node.id,
                 nodeName: node.nodeName,
                 contextMenuItems: node.contextMenuItems,
+                appData: node.appData
             }
             if (node.children && node.children.length > 0) {
                 newNode.children = this.copyTree(node.children)
             }
+
             newTree.push(newNode)
         }
         return newTree
