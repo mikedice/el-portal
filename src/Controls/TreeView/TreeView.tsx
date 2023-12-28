@@ -11,10 +11,11 @@ const useStyles = makeStyles({
     }
 });
 
-export default function TreeView<T>({ appData, setAppContextMenuSelection }: 
+export default function TreeView<T>({ appData, setAppContextMenuSelection, setAppSelection }: 
     {
         appData: TreeNode<T>[], 
         setAppContextMenuSelection: (selection:ContextMenuSelection)=>void
+        setAppSelection: (selection: string) => void
     })
     {
     // The contextMenuState is lifted to the TreeView so the TreeView can control the showing of 
@@ -28,6 +29,10 @@ export default function TreeView<T>({ appData, setAppContextMenuSelection }:
     // then it needs to let the app know that a context menu item was selected.
     const [contextMenuSelection, setContextMenuSelection] = useState<ContextMenuSelection>({ menuId: "", menuValue: "", menuLabel: "", nodeId: "" });
 
+    // The selected item is lifted to the TreeView as the treeview is the top of the view hierarchy.
+    // The selected item represents the node in the tree that was selected by the user. The treeview
+    const [selectedItem, setSelectedItem] = useState<string>("");
+
     // When a context menu item is selected the context menu will set the contextMenuSelection state
     // variable. This useEffect watches the contextMenuSelection state variable for changes. If change
     // is detected it dismisses all context menus and does something with the new selection
@@ -40,6 +45,11 @@ export default function TreeView<T>({ appData, setAppContextMenuSelection }:
             setAppContextMenuSelection(contextMenuSelection)
         }
     }, [contextMenuSelection]);
+
+    useEffect(() => {
+        // A node in the tree was selected notify the app by setting it's selected item state
+        setAppSelection(selectedItem)
+    }, [selectedItem]);
 
     const styles = useStyles();
 
@@ -56,7 +66,9 @@ export default function TreeView<T>({ appData, setAppContextMenuSelection }:
                         setContextMenuState={setContextMenuState}
                         setContextMenuSelection={setContextMenuSelection}
                         nodeId={node.id ?? ""}
-                        key={node.id}>
+                        key={node.id}
+                        selectedItem={selectedItem}
+                        setSelectedItem={setSelectedItem}>
                         <ul className={styles.treeView}>
                             {createTree(node.children ?? [])}
                         </ul>
@@ -72,6 +84,8 @@ export default function TreeView<T>({ appData, setAppContextMenuSelection }:
                     setContextMenuState={setContextMenuState}
                     setContextMenuSelection={setContextMenuSelection}
                     key={node.id}
+                    selectedItem={selectedItem}
+                    setSelectedItem={setSelectedItem}
                     children={undefined}></ContextualListItem>
             }
         });

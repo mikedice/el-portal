@@ -35,10 +35,29 @@ const useStyles = makeStyles({
     },
     contextualListItem: {
         fontSize: tokens.fontSizeBase500
+    },
+    itemNotSelected: {
+        fontSize: tokens.fontSizeBase500,
+        backgroundColor: tokens.colorNeutralBackground1,
+        cursor: 'pointer',
+        ':hover': {
+            backgroundColor: tokens.colorNeutralBackground1Hover,
+        }
+    },
+    itemSelected: {
+        fontSize: tokens.fontSizeBase500,
+        backgroundColor: tokens.colorNeutralBackground1Selected,
+        cursor: 'pointer',
+        ':hover': {
+            backgroundColor: tokens.colorNeutralBackground1Selected,
+        }
+        
     }
 });
 
-export function ContextualListItem({ children, name, nodeId, contextMenuItems, contextMenuState, setContextMenuState, setContextMenuSelection }:
+export function ContextualListItem({ children, name, nodeId, contextMenuItems, contextMenuState,
+    setContextMenuState, setContextMenuSelection,
+    selectedItem, setSelectedItem }:
     {
         children: React.ReactNode,
         name: string,
@@ -46,7 +65,9 @@ export function ContextualListItem({ children, name, nodeId, contextMenuItems, c
         contextMenuItems?: TreeContextMenuItem[],
         contextMenuState: ContextMenuState
         setContextMenuState: (state: ContextMenuState) => void,
-        setContextMenuSelection: (selection: ContextMenuSelection) => void
+        setContextMenuSelection: (selection: ContextMenuSelection) => void,
+        selectedItem: string,
+        setSelectedItem: (selectedItem: string) => void
     }) {
 
     const [collapsedState, setCollapsedState] = useState<boolean>(false);
@@ -54,6 +75,7 @@ export function ContextualListItem({ children, name, nodeId, contextMenuItems, c
 
     function dismissContextMenus() {
         setContextMenuState({ ...contextMenuState, nodeId: "" });
+        setSelectedItem("");
     }
 
     // Dismiss the context menu if the user clicks outside of it
@@ -88,9 +110,15 @@ export function ContextualListItem({ children, name, nodeId, contextMenuItems, c
         setCollapsedState(!collapsedState);
     }
 
+    const handleItemClick = (event: React.MouseEvent) => {
+        event.preventDefault();
+        event.stopPropagation();
+        setSelectedItem(nodeId);
+    }
+
     return (
 
-        <li className={styles.contextualListItem} onContextMenu={handleContextMenu} >
+        <li className={styles.contextualListItem} onContextMenu={handleContextMenu} onClick={handleItemClick}>
             <div className={styles.nodeExpanderLabel}>
                 {/* A caret that gets toggled base on the collapsedState state variable */}
                 {
@@ -100,7 +128,7 @@ export function ContextualListItem({ children, name, nodeId, contextMenuItems, c
                             : <CaretDown24Regular className={styles.nodeExpanderIcon} onClick={handleExpanderClick} />)
                 }
                 {/* A span that contains the name of hte LI */}
-                {<span>{name}</span>}
+                {<span className={selectedItem == nodeId ? styles.itemSelected : styles.itemNotSelected}>{name}</span>}
             </div>
 
             {/* All the children that may or may not have been passed in */}

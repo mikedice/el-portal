@@ -58,9 +58,13 @@ function App() {
       label: "add Section"
     }]));
 
-  // The app keeps a state property that is modified when a context menu is selected. The app would
+  // The app keeps a state property that is modified when a context menu item is selected. The app would
   // usually monitor changes to this variable and perform an app specific action in response.
   const [contextMenuSelection, setContextMenuSelection] = useState<ContextMenuSelection>({ menuId: "", menuValue: "", menuLabel: "", nodeId: "" });
+
+  // The app keeps a state property that is modified when a tree node is selected. The app would
+  // usually monitor changes to this variable and perform an app specific action in response.
+  const [selectedItem, setSelectedItem] = useState<string>("");
 
   // The app monitors changes to the context menu selection and performs an action based on the
   // menu item selected.
@@ -77,13 +81,28 @@ function App() {
     }
   }, [contextMenuSelection]);
 
+  // Montioring for changes to the selected item state. If the selected item changes
+  // the app can do something with it.
+  useEffect(() => {
+    if (selectedItem === "") return;
+
+    const node = treeManager.findNode(selectedItem, treeData);
+    if (node)
+    {
+      console.log(`App Tree node selected: ${node.nodeName}`);
+      // TODO: need to do something with the selected node
+    }
+
+  }, [selectedItem]);
+
   return (
     <>
       <h1>El Portal Controls</h1>
       <h2>Tree control</h2>
       <div>
         <TreeView appData={treeData}
-          setAppContextMenuSelection={setContextMenuSelection}></TreeView>
+          setAppContextMenuSelection={setContextMenuSelection}
+          setAppSelection={setSelectedItem}></TreeView>
       </div>
     </>
   )
