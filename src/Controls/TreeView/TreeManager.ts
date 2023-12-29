@@ -12,7 +12,7 @@ import { ContextMenuSelection } from "./ContextualListItem";
 // TreeManager constructor. Use TreeManager helpers to apply tree
 // mutations to the tree
 export interface ICommandMap<T> {
-    [key: string]: (contextMenuItem: ContextMenuSelection, currTree: TreeNode<T>[]) => TreeNode<T>[] | undefined
+    [key: string]: (contextMenuItem: ContextMenuSelection, currTree: TreeNode<T>[], treeManager: TreeManager<T>) => TreeNode<T>[] | undefined
 }
 
 // The TreeManager class is a helper class with helper functions for mutating a tree
@@ -114,7 +114,7 @@ export class TreeManager<T>{
         // search the commandMap for a key that is equal to the commandId
         // if found, call the function that is the value of that key
         if (this.commandMap && this.commandMap[menuItem.menuId]) {
-            newTree = this.commandMap[menuItem.menuId](menuItem, currTree);
+            newTree = this.commandMap[menuItem.menuId](menuItem, currTree, this);
         }
         return newTree;
     }

@@ -14,7 +14,7 @@ const commands: ICommandMap<number> = {
 };
 
 // Context Menu Handlers
-function createNewSection(command: ContextMenuSelection, currTree: TreeNode<number>[]): TreeNode<number>[] | undefined {
+function createNewSection(command: ContextMenuSelection, currTree: TreeNode<number>[], treeManager: TreeManager<number>): TreeNode<number>[] | undefined {
   const node = treeManager.findNode(command.nodeId, currTree);
   if (node) {
     const newNode: TreeNode<number> = {
@@ -38,7 +38,7 @@ function createNewSection(command: ContextMenuSelection, currTree: TreeNode<numb
   return undefined;
 }
 
-function deleteSection(command: ContextMenuSelection, currTree: TreeNode<number>[]): TreeNode<number>[] | undefined {
+function deleteSection(command: ContextMenuSelection, currTree: TreeNode<number>[], treeManager: TreeManager<number>): TreeNode<number>[] | undefined {
   const node = treeManager.findNode(command.nodeId, currTree);
   if (node) {
     return treeManager.deleteNode(node.id!, currTree);
