@@ -1,4 +1,3 @@
-
 import './App.css'
 import TreeView from './Controls/TreeView/TreeView'
 import { useState } from 'react'
@@ -14,7 +13,8 @@ const commands: ICommandMap<number> = {
 };
 
 // Context Menu Handlers
-function createNewSection(command: ContextMenuSelection, currTree: TreeNode<number>[], treeManager: TreeManager<number>): TreeNode<number>[] | undefined {
+function createNewSection(command: ContextMenuSelection, currTree: TreeNode<number>[], treeManager: TreeManager<number>): [
+  TreeNode<number>[] | undefined, string | undefined] {
   const node = treeManager.findNode(command.nodeId, currTree);
   if (node) {
     const newNode: TreeNode<number> = {
@@ -33,30 +33,36 @@ function createNewSection(command: ContextMenuSelection, currTree: TreeNode<numb
         }
       ],
     };
-    return treeManager.addChild(node, newNode, currTree);
+    return [treeManager.addChild(node, newNode, currTree), newNode.id!];
   }
-  return undefined;
+  return [undefined, undefined];
 }
 
-function deleteSection(command: ContextMenuSelection, currTree: TreeNode<number>[], treeManager: TreeManager<number>): TreeNode<number>[] | undefined {
+function deleteSection(command: ContextMenuSelection, currTree: TreeNode<number>[], treeManager: TreeManager<number>): 
+  [TreeNode<number>[] | undefined, string | undefined]
+{
   const node = treeManager.findNode(command.nodeId, currTree);
   if (node) {
-    return treeManager.deleteNode(node.id!, currTree);
+    return [treeManager.deleteNode(node.id!, currTree), undefined];
   }
-  return undefined;
+  return [undefined, undefined];
 }
 
 // The tree manager that handles operations on the data renderd by TreeView
 const treeManager = new TreeManager<number>(commands);
 
+const initialDocument = treeManager.createNewTree('Document', 0, [
+  {
+    id: "addSection",
+    value: "Add Section",
+    label: "add Section"
+  }]);
+
+  const initialItem = initialDocument[0].id;
+
 function App() {
   // The application must keep track of the tree data used by the tree view as React state
-  const [treeData, setTreeData] = useState<TreeNode<number>[]>(treeManager.createNewTree('Document', 0, [
-    {
-      id: "addSection",
-      value: "Add Section",
-      label: "add Section"
-    }]));
+  const [treeData, setTreeData] = useState<TreeNode<number>[]>(initialDocument);
 
   // The app keeps a state property that is modified when a context menu item is selected. The app would
   // usually monitor changes to this variable and perform an app specific action in response.
@@ -64,20 +70,23 @@ function App() {
 
   // The app keeps a state property that is modified when a tree node is selected. The app would
   // usually monitor changes to this variable and perform an app specific action in response.
-  const [selectedItem, setSelectedItem] = useState<string>("");
+  const [selectedItem, setSelectedItem] = useState<string>(initialItem || "");
 
   // The app monitors changes to the context menu selection and performs an action based on the
   // menu item selected.
   useEffect(() => {
     if (contextMenuSelection.nodeId) {
-      console.log(`App Tree menu item selected: ${JSON.stringify(contextMenuSelection)}`)
-
       // Use the tree manager to process the command via your command map. If the 
-      // processing of the command results in an update to the tree data, TreeView's view
-      // of the data is updated with the setTreeData() function which causes React to 
-      // re-render the TreeView component.
-      const newTree = treeManager.processCommand(contextMenuSelection, treeData);
+      // processing of the command results in an update to the tree data, a new tree
+      // is returned with a copy of the tree with the new mutation applied. The 
+      // new tree is passed to React to update the view
+      const [newTree, newNodeId] = treeManager.processCommand(contextMenuSelection, treeData);
       if (newTree) setTreeData(newTree);
+      if (newNodeId) 
+      {
+        console.log(`App Tree new node created by context menu: ${newNodeId}`);
+        setSelectedItem(newNodeId);
+      }
     }
   }, [contextMenuSelection]);
 
@@ -89,7 +98,7 @@ function App() {
     const node = treeManager.findNode(selectedItem, treeData);
     if (node)
     {
-      console.log(`App Tree node selected: ${node.nodeName}`);
+      console.log(`App Tree node selected: ${node.id}`);
       // TODO: need to do something with the selected node
     }
 
@@ -102,7 +111,8 @@ function App() {
       <div>
         <TreeView appData={treeData}
           setAppContextMenuSelection={setContextMenuSelection}
-          setAppSelection={setSelectedItem}></TreeView>
+          selectedItem={selectedItem}
+          setSelectedItem={setSelectedItem}></TreeView>
       </div>
     </>
   )

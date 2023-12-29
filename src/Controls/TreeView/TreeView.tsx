@@ -11,11 +11,12 @@ const useStyles = makeStyles({
     }
 });
 
-export default function TreeView<T>({ appData, setAppContextMenuSelection, setAppSelection }: 
+export default function TreeView<T>({ appData, setAppContextMenuSelection, selectedItem, setSelectedItem}: 
     {
         appData: TreeNode<T>[], 
-        setAppContextMenuSelection: (selection:ContextMenuSelection)=>void
-        setAppSelection: (selection: string) => void
+        setAppContextMenuSelection: (selection:ContextMenuSelection)=>void,
+        selectedItem: string,
+        setSelectedItem: (selection: string) => void
     })
     {
     // The contextMenuState is lifted to the TreeView so the TreeView can control the showing of 
@@ -29,10 +30,6 @@ export default function TreeView<T>({ appData, setAppContextMenuSelection, setAp
     // then it needs to let the app know that a context menu item was selected.
     const [contextMenuSelection, setContextMenuSelection] = useState<ContextMenuSelection>({ menuId: "", menuValue: "", menuLabel: "", nodeId: "" });
 
-    // The selected item is lifted to the TreeView as the treeview is the top of the view hierarchy.
-    // The selected item represents the node in the tree that was selected by the user. The treeview
-    const [selectedItem, setSelectedItem] = useState<string>("");
-
     // When a context menu item is selected the context menu will set the contextMenuSelection state
     // variable. This useEffect watches the contextMenuSelection state variable for changes. If change
     // is detected it dismisses all context menus and does something with the new selection
@@ -45,11 +42,6 @@ export default function TreeView<T>({ appData, setAppContextMenuSelection, setAp
             setAppContextMenuSelection(contextMenuSelection)
         }
     }, [contextMenuSelection]);
-
-    useEffect(() => {
-        // A node in the tree was selected notify the app by setting it's selected item state
-        setAppSelection(selectedItem)
-    }, [selectedItem]);
 
     const styles = useStyles();
 
