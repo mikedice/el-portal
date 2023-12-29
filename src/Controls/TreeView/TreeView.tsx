@@ -58,7 +58,7 @@ export default function TreeView<T>({ appData, setAppContextMenuSelection, setAp
 
         var jsx = data.map((node: TreeNode<T>) => {
 
-            if (node.children !== undefined || (node.children ?? []).length > 0) {
+            if (node.children !== undefined && node.children.length > 0) {
                 return (
                     <ContextualListItem name={node.nodeName}
                         contextMenuItems={node.contextMenuItems}

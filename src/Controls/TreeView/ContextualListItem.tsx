@@ -77,6 +77,7 @@ export function ContextualListItem({ children, name, nodeId, contextMenuItems, c
         setContextMenuState({ ...contextMenuState, nodeId: "" });
     }
 
+
     // Dismiss the context menu if the user clicks outside of it
     useEffect(() => {
         const handleClickOutside = () => {
