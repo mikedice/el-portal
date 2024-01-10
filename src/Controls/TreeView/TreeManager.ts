@@ -39,11 +39,13 @@ export class TreeManager<T>{
         return null
     }
 
-    public addChild(node: TreeNode<T>, newEntry: TreeNode<T>, tree: TreeNode<T>[]): TreeNode<T>[] {
+    public addChild(node: TreeNode<T>, newEntry: TreeNode<T>, tree: TreeNode<T>[], addToFront:boolean = false): TreeNode<T>[] {
         if (!node) return tree
         if (!node.children) node.children = []
         newEntry.id = this.makeComponentId();
-        node.children.push(newEntry);
+        addToFront ? node.children.unshift(newEntry)
+                   : node.children.push(newEntry);
+                   
         return this.copyTree(tree);
     }
 
@@ -73,6 +75,20 @@ export class TreeManager<T>{
             }
         }
         return newTree
+    }
+
+    public findParentNode(nodeId: string, tree: TreeNode<T>[]): TreeNode<T> | null {
+        if (tree.length === 0) return null
+        for (const node of tree) {
+            if (node.children && node.children.length > 0) {
+                for (const child of node.children) {
+                    if (child.id === nodeId) return node
+                }
+                const foundNode = this.findParentNode(nodeId, node.children)
+                if (foundNode) return foundNode
+            }
+        }
+        return null // not found
     }
 
     private makeComponentId(length?: number) {
