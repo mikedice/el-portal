@@ -3,7 +3,6 @@ import { ContextMenuState, ContextMenuSelection, ContextualListItem } from "./Co
 import { TreeNode } from "./TreeNode"
 import { useState, useEffect } from "react"
 
-
 const useStyles = makeStyles({
     treeView: {
         'list-style-type': 'none',
@@ -13,12 +12,12 @@ const useStyles = makeStyles({
 
 export default function TreeView<T>({ appData, setAppContextMenuSelection, selectedItem, setSelectedItem}: 
     {
-        appData: TreeNode<T>[], 
+        appData: TreeNode<T>, 
         setAppContextMenuSelection: (selection:ContextMenuSelection)=>void,
         selectedItem: string,
         setSelectedItem: (selection: string) => void
     })
-    {
+{
     // The contextMenuState is lifted to the TreeView so the TreeView can control the showing of 
     // context menus on nodes within the tree. This results in prevention of more than one context
     // menu showing at a time and the dismissing of all context menus if the user clicks off a menu.
@@ -45,48 +44,47 @@ export default function TreeView<T>({ appData, setAppContextMenuSelection, selec
 
     const styles = useStyles();
 
-    // Recursively walk the tree and create JSX. Fun!
-    function createTree(data: TreeNode<T>[]) {
+    
 
-        var jsx = data.map((node: TreeNode<T>) => {
-
-            if (node.children !== undefined && node.children.length > 0) {
-                return (
-                    <ContextualListItem name={node.nodeName}
-                        contextMenuItems={node.contextMenuItems}
-                        contextMenuState={contextMenuState}
-                        setContextMenuState={setContextMenuState}
-                        setContextMenuSelection={setContextMenuSelection}
-                        nodeId={node.id ?? ""}
-                        key={node.id}
-                        selectedItem={selectedItem}
-                        setSelectedItem={setSelectedItem}>
-                        <ul className={styles.treeView}>
-                            {createTree(node.children ?? [])}
-                        </ul>
-                    </ContextualListItem>
-                );
-            }
-            else {
-                return <ContextualListItem
-                    name={node.nodeName}
+    // Recursive function to create the tree view from the tree data
+    function createTree(data: TreeNode<T>) {
+        if (data.children !== undefined && data.children.length > 0) {
+           return  data.children.map((node) => {
+            return (
+                <ContextualListItem name={node.nodeName}
                     contextMenuItems={node.contextMenuItems}
-                    nodeId={node.id ?? ""}
                     contextMenuState={contextMenuState}
                     setContextMenuState={setContextMenuState}
                     setContextMenuSelection={setContextMenuSelection}
+                    nodeId={node.id ?? ""}
                     key={node.id}
                     selectedItem={selectedItem}
-                    setSelectedItem={setSelectedItem}
-                    children={undefined}></ContextualListItem>
-            }
-        });
-        return jsx;
+                    setSelectedItem={setSelectedItem}>
+                    <ul className={styles.treeView}>
+                        {createTree(node)}
+                    </ul>
+                </ContextualListItem>
+            );
+        });}
+        
     }
-  
+     
     return (
         <ul className={styles.treeView}>
-            {createTree(appData)}
+            <ContextualListItem
+                name={appData.nodeName}
+                contextMenuItems={appData.contextMenuItems}
+                nodeId={appData.id ?? ""}
+                contextMenuState={contextMenuState}
+                setContextMenuState={setContextMenuState}
+                setContextMenuSelection={setContextMenuSelection}
+                key={appData.id}
+                selectedItem={selectedItem}
+                setSelectedItem={setSelectedItem}>
+                      {appData.children && appData.children.length > 0 && <ul className={styles.treeView}>
+                            {createTree(appData)}
+                        </ul>}
+            </ContextualListItem>
         </ul>
     )
 }

@@ -13,8 +13,8 @@ const commands: ICommandMap<number> = {
 };
 
 // Context Menu Handlers
-function createNewSection(command: ContextMenuSelection, currTree: TreeNode<number>[], treeManager: TreeManager<number>): [
-  TreeNode<number>[] | undefined, string | undefined] {
+function createNewSection(command: ContextMenuSelection, currTree: TreeNode<number>, treeManager: TreeManager<number>): [
+  TreeNode<number>| undefined, string | undefined] {
   const node = treeManager.findNode(command.nodeId, currTree);
   if (node) {
     const newNode: TreeNode<number> = {
@@ -38,8 +38,8 @@ function createNewSection(command: ContextMenuSelection, currTree: TreeNode<numb
   return [undefined, undefined];
 }
 
-function deleteSection(command: ContextMenuSelection, currTree: TreeNode<number>[], treeManager: TreeManager<number>): 
-  [TreeNode<number>[] | undefined, string | undefined]
+function deleteSection(command: ContextMenuSelection, currTree: TreeNode<number>, treeManager: TreeManager<number>): 
+  [TreeNode<number> | undefined, string | undefined]
 {
   const node = treeManager.findNode(command.nodeId, currTree);
   if (node) {
@@ -58,11 +58,11 @@ const initialDocument = treeManager.createNewTree('Document', 0, [
     label: "add Section"
   }]);
 
-  const initialItem = initialDocument[0].id;
+  const initialItem = initialDocument.id;
 
 function App() {
   // The application must keep track of the tree data used by the tree view as React state
-  const [treeData, setTreeData] = useState<TreeNode<number>[]>(initialDocument);
+  const [treeData, setTreeData] = useState<TreeNode<number>>(initialDocument);
 
   // The app keeps a state property that is modified when a context menu item is selected. The app would
   // usually monitor changes to this variable and perform an app specific action in response.

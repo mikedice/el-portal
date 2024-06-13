@@ -12,8 +12,8 @@ import { ContextMenuSelection } from "./ContextualListItem";
 // TreeManager constructor. Use TreeManager helpers to apply tree
 // mutations to the tree
 export interface ICommandMap<T> {
-    [key: string]: (contextMenuItem: ContextMenuSelection, currTree: TreeNode<T>[], treeManager: TreeManager<T>) => 
-        [TreeNode<T>[] | undefined, string|undefined]
+    [key: string]: (contextMenuItem: ContextMenuSelection, currTree: TreeNode<T>, treeManager: TreeManager<T>) => 
+        [TreeNode<T> | undefined, string|undefined]
 }
 
 // The TreeManager class is a helper class with helper functions for mutating a tree
@@ -27,19 +27,22 @@ export class TreeManager<T>{
         if (commandMap) this.commandMap = commandMap
     }
 
-    public findNode(nodeId: string, tree: TreeNode<T>[]): TreeNode<T> | null {
-        if (tree.length === 0) return null
-        for (const node of tree) {
-            if (node.id === nodeId) return node
-            if (node.children && node.children.length > 0) {
-                const foundNode = this.findNode(nodeId, node.children)
+    public findNode(nodeId: string, tree: TreeNode<T>): TreeNode<T> | null {
+        // recursively search the tree for a node with the given id and return that node if found
+        if (tree.id === nodeId) return tree
+        if (tree.children && tree.children.length > 0) {
+            for (const child of tree.children) {
+                const foundNode = this.findNode(nodeId, child)
                 if (foundNode) return foundNode
             }
         }
         return null
     }
 
-    public addChild(node: TreeNode<T>, newEntry: TreeNode<T>, tree: TreeNode<T>[], addToFront:boolean = false): TreeNode<T>[] {
+
+    // Add newEntry as a childNode of node in the tree. If addToFront is true, add to the front of the children array
+    // otherwise add to the end of the children array. Return a new copy of the modified tree.
+    public addChild(node: TreeNode<T>, newEntry: TreeNode<T>, tree: TreeNode<T>, addToFront:boolean = false): TreeNode<T> {
         if (!node) return tree
         if (!node.children) node.children = []
         newEntry.id = this.makeComponentId();
@@ -49,49 +52,48 @@ export class TreeManager<T>{
         return this.copyTree(tree);
     }
 
-    public updateNode(node: TreeNode<T>, tree: TreeNode<T>[]): TreeNode<T>[] {
-        const newTree: TreeNode<T>[] = []
-        for (const treeNode of tree) {
-            if (treeNode.id === node.id) {
-                newTree.push(node)
-            } else {
-                if (treeNode.children && treeNode.children.length > 0) {
-                    treeNode.children = this.updateNode(node, treeNode.children)
-                }
-                newTree.push(treeNode)
-            }
+    // find node in the tree matching by node.id and if the node is found copy the new node's data into the found node.
+    // Return a new copy of the modified tree.
+    public updateNode(node: TreeNode<T>, tree: TreeNode<T>): TreeNode<T> {
+        if (!node) return tree
+        const foundNode = this.findNode(node.id ?? "", tree)
+        if (foundNode) {
+            foundNode.nodeName = node.nodeName;
+            foundNode.appData = node.appData;
+            foundNode.contextMenuItems = Array.from(node.contextMenuItems ?? []);
+            foundNode.children = Array.from(node.children ?? []);
         }
-        return newTree
+        return this.copyTree(tree)
+
     }
 
-    public deleteNode(nodeId: string, tree: TreeNode<T>[]): TreeNode<T>[] {
-        const newTree: TreeNode<T>[] = []
-        for (const node of tree) {
-            if (node.id !== nodeId) {
-                if (node.children && node.children.length > 0) {
-                    node.children = this.deleteNode(nodeId, node.children)
-                }
-                newTree.push(node)
+    // find the parent node of the node with nodeId in the tree and delete the node with nodeId from the parent's children array.
+    public deleteNode(nodeId: string, tree: TreeNode<T>): TreeNode<T> {
+        const parentNode = this.findParentNode(nodeId, tree)
+        if (parentNode) {
+            const newChildren = parentNode.children?.filter((child) => child.id !== nodeId)
+            if (newChildren) {
+                parentNode.children = newChildren
             }
         }
-        return newTree
+        return this.copyTree(tree)
+
     }
 
-    public findParentNode(nodeId: string, tree: TreeNode<T>[]): TreeNode<T> | null {
-        if (tree.length === 0) return null
-        for (const node of tree) {
-            if (node.children && node.children.length > 0) {
-                for (const child of node.children) {
-                    if (child.id === nodeId) return node
-                }
-                const foundNode = this.findParentNode(nodeId, node.children)
+    // find the parent node of the node with nodeId in the tree and return the parent node.
+    public findParentNode(nodeId: string, tree: TreeNode<T>): TreeNode<T> | null {
+        if (tree.children && tree.children.length > 0) {
+            for (const child of tree.children) {
+                if (child.id === nodeId) return tree
+                const foundNode = this.findParentNode(nodeId, child)
                 if (foundNode) return foundNode
             }
         }
-        return null // not found
+        return null;
     }
 
-    private makeComponentId(length?: number) {
+    // Create a random string of characters of length length
+    private makeComponentId(length?: number): string {
         if (!length) {
             length = 6;
         }
@@ -107,25 +109,25 @@ export class TreeManager<T>{
         return result;
     }
 
-    public copyTree(tree: TreeNode<T>[]): TreeNode<T>[] {
-        const newTree: TreeNode<T>[] = []
-        for (const node of tree) {
-            const newNode: TreeNode<T> = {
-                id: node.id,
-                nodeName: node.nodeName,
-                contextMenuItems: node.contextMenuItems,
-                appData: node.appData
-            }
-            if (node.children && node.children.length > 0) {
-                newNode.children = this.copyTree(node.children)
-            }
+    // Copy every node of tree to a new tree and return the new tree
+    public copyTree(tree: TreeNode<T>): TreeNode<T> {
+        const newTree: TreeNode<T> = {
+            id: tree.id,
+            nodeName: tree.nodeName,
+            appData: tree.appData,
+            contextMenuItems: Array.from(tree.contextMenuItems ?? []),
+            children: []
+        }
 
-            newTree.push(newNode)
+        if (tree.children && tree.children.length > 0) {
+            tree.children.forEach((child) => {
+                if (newTree.children) newTree.children.push(this.copyTree(child))
+            })
         }
         return newTree
     }
 
-    public processCommand(menuItem: ContextMenuSelection, currTree: TreeNode<T>[]): [TreeNode<T>[] | undefined, newNodeId:string | undefined] 
+    public processCommand(menuItem: ContextMenuSelection, currTree: TreeNode<T>): [TreeNode<T> | undefined, newNodeId:string | undefined] 
     {
         // search the commandMap for a key that is equal to the commandId
         // if found, call the function that is the value of that key
@@ -136,12 +138,12 @@ export class TreeManager<T>{
     }
 
     // Create a new tree from scratch with no data in it
-    public createNewTree(nodeName: string, appData: T, contextMenuItems: TreeContextMenuItem[] | undefined): TreeNode<T>[] {
-        return [{
+    public createNewTree(nodeName: string, appData: T, contextMenuItems: TreeContextMenuItem[] | undefined): TreeNode<T> {
+        return {
             id: this.makeComponentId(),
             nodeName: nodeName,
             appData: appData,
             contextMenuItems: contextMenuItems
-        }]
+        };
     }
 }
